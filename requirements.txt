@@ -2,3 +2,4 @@ streamlit
 langchain
 HuggingFace
 beautifulsoup4
+chromadb
