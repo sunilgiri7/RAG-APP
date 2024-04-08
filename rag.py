@@ -71,10 +71,14 @@ def get_response(url, query):
 
 def main():
     st.title("RAG System")
-    url = st.text_input("Enter the URL:")
-    query = st.text_input("Enter your query:")
-    if url and query:
-        response = get_response(url, query)
+    st.write("Welcome to the RAG System!")
+    st.write("Enter a URL or query to get started:")
+
+    url_input = st.text_input("Enter URL:", "")
+    query_input = st.text_input("Enter query:", "")
+
+    if url_input and query_input:
+        response = get_response(url_input, query_input)
         assistant_response = response.split('Human:')[1].strip() if 'Human:' in response else response
         st.write(assistant_response)
 
