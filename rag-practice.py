@@ -9,7 +9,9 @@ from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema.output_parser import StrOutputParser
 from langchain.prompts import ChatPromptTemplate
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 HF_TOKEN = os.getenv('HUGGINGFACEHUB_API_TOKEN')
 
 def get_response(url, query):

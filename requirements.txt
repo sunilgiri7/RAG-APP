@@ -1,7 +1,0 @@
-streamlit
-langchain
-python-dotenv   
-langchain_community
-chromadb
-faiss-cpu
-langchain_core
