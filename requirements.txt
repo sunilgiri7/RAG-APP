@@ -2,4 +2,4 @@ streamlit
 langchain
 HuggingFace
 beautifulsoup4
-chromadb
+chromadb==0.4.24
