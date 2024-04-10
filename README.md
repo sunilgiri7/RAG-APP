@@ -29,8 +29,8 @@ Note: Website URL syntax should be "https://", else the connection will not be s
 Ensure you have Python installed on your system. Then clone this repository:
 
 ```bash
-git clone https://github.com/imsaksham-c/WebChat-WebsiteChatbot.git
-cd WebChat-WebsiteChatbot
+git clone https://github.com/sunilgiri7/RAG-APP.git
+cd RAG-APP
 ```
 
 Install the required packages:
