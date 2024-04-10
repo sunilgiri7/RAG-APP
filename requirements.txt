@@ -1,0 +1,10 @@
+langchain==0.1.6
+langchain-community==0.0.19
+langchain-core==0.1.23
+langchain_openai==0.0.5
+python-dotenv==1.0.1
+streamlit==1.30.0
+chromadb==0.3.29
+bs4==0.0.2
+huggingface-hub==0.22.2
+watchdog
