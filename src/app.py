@@ -9,8 +9,8 @@ from dotenv import load_dotenv
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.embeddings import HuggingFaceInferenceAPIEmbeddings
-from langchain.llms import HuggingFaceHub
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
+from langchain_community.llms import HuggingFaceHub
 import re
 
 load_dotenv()
@@ -92,8 +92,8 @@ def get_response(user_input):
     return response['answer']
 
 # app config
-st.set_page_config(page_title="WebChat 🤖: Chat with Websites", page_icon="🤖")
-st.title("WebChat 🤖: Chat with Websites")
+st.set_page_config(page_title="WebChat 🤖: Chat With Websites", page_icon="")
+st.title("WebChat 🤖: Your Web Assistant")
 
 if "freeze" not in st.session_state:
     st.session_state.freeze = False
