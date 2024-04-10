@@ -42,7 +42,7 @@ pip install -r requirements.txt
 Create your own `.env` file with the following variables:
 
 ```plaintext
-OPENAI_API_KEY=[your-openai-api-key]
+HUGGINGFACEHUB_API_TOKEN=[YOUR_HUGGINGFACEHUB_API_TOKEN]
 ```
 
 ## Usage
