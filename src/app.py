@@ -28,7 +28,7 @@ def get_vectorstore_from_url(url, max_depth):
         document = loader.load()
 
         # Split text
-        text_splitter = RecursiveCharacterTextSplitter()
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=256, chunk_overlap=0)
         document_chunks = text_splitter.split_documents(document)
 
         # Create embeddings
