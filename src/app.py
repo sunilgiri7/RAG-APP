@@ -92,7 +92,7 @@ def get_response(user_input):
     return response['answer']
 
 # app config
-st.set_page_config(page_title="WebChat 🤖: Chat With Websites", page_icon="")
+st.set_page_config(page_title="WebChat 🤖: Chat With Websites", page_icon="🤖")
 st.title("WebChat 🤖: Your Web Assistant")
 
 if "freeze" not in st.session_state:
