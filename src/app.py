@@ -34,7 +34,7 @@ def get_vectorstore_from_url(url, max_depth):
         # Create embeddings
         embedding = HuggingFaceInferenceAPIEmbeddings(
             api_key=HF_TOKEN,
-            model_name="sentence-transformers/all-MiniLM-l6-v2"
+            model_name="sentence-transformers/all-mpnet-base-v2"
         )
 
         vector_store = Chroma.from_documents(document_chunks, embedding)
@@ -73,7 +73,7 @@ def get_conversational_rag_chain(retriever_chain):
     prompt = ChatPromptTemplate.from_messages([
       ("system", "Answer the user's questions based on the below context:{context}\n\n"),
       MessagesPlaceholder(variable_name="chat_history"),
-      ("user", "{input}"),
+      ("user", "{input}")
     ])
     
     stuff_documents_chain = create_stuff_documents_chain(llm,prompt)
@@ -85,7 +85,7 @@ def get_response(user_input):
     conversation_rag_chain = get_conversational_rag_chain(retriever_chain)
     
     response = conversation_rag_chain.invoke({
-        "chat_history": st.session_state.chat_history,
+        "chat_history": [],
         "input": user_input
     })
     
@@ -116,9 +116,7 @@ else:
     if st.session_state.freeze:
         # session state
         if "chat_history" not in st.session_state:
-            st.session_state.chat_history = [
-                AIMessage(content="Hello, I am a bot. How can I help you?"),
-            ]
+            st.session_state.chat_history = []
         if "vector_store" not in st.session_state:
             with st.sidebar:
                 with st.spinner("Scrapping Website..."):
@@ -134,7 +132,7 @@ else:
 
         # user input
         user_query = st.chat_input("Type your message here...")
-        if user_query is not None and user_query != "":
+        if user_query:
             response = get_response(user_query)
             st.session_state.chat_history.append(HumanMessage(content=user_query))
             st.session_state.chat_history.append(AIMessage(content=response))
