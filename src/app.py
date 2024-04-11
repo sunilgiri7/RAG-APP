@@ -71,14 +71,17 @@ def get_conversational_rag_chain(retriever_chain):
     )
     
     prompt = ChatPromptTemplate.from_messages([
-      ("system", "Answer the user's questions based on the below context:{context}\n\n"),
-      MessagesPlaceholder(variable_name="chat_history"),
-      ("user", "{input}")
+        ("system", "You are an AI assistant that can provide concise and relevant answers based on the given context. Do not output the entire context, only the relevant information to answer the user's query."),
+        MessagesPlaceholder(variable_name="chat_history"),
+        ("user", "{input}"),
+        ("system", "Context: {context}"),
+        ("user", "Given the above context, provide a concise and relevant answer to the original query.")
     ])
     
-    stuff_documents_chain = create_stuff_documents_chain(llm,prompt)
+    stuff_documents_chain = create_stuff_documents_chain(llm, prompt)
+    conversation_rag_chain = create_retrieval_chain(retriever_chain, stuff_documents_chain)
     
-    return create_retrieval_chain(retriever_chain, stuff_documents_chain)
+    return conversation_rag_chain
 
 def get_response(user_input):
     retriever_chain = get_context_retriever_chain(st.session_state.vector_store)
