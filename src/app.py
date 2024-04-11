@@ -1,4 +1,5 @@
 import os
+import traceback
 import streamlit as st
 from utils.get_urls import scrape_urls
 from langchain_core.messages import AIMessage, HumanMessage
@@ -11,10 +12,10 @@ from langchain.chains import create_history_aware_retriever, create_retrieval_ch
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 from langchain_community.llms import HuggingFaceHub
-import re
 
 load_dotenv()
-HF_TOKEN = os.getenv('HUGGINGFACEHUB_API_TOKEN')
+# HF_TOKEN = os.getenv('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')
+HF_TOKEN = "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"
 
 def get_vectorstore_from_url(url, max_depth):
     try:
@@ -36,11 +37,12 @@ def get_vectorstore_from_url(url, max_depth):
             api_key=HF_TOKEN,
             model_name="sentence-transformers/all-mpnet-base-v2"
         )
-
+        print(embedding)
         vector_store = Chroma.from_documents(document_chunks, embedding)
         return vector_store, len(urls)
     except Exception as e:
         st.error(f"Error occurred during scraping: {e}")
+        traceback.print_exc()
         return None, 0
 
 
