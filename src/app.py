@@ -12,22 +12,29 @@ from langchain.chains import create_history_aware_retriever, create_retrieval_ch
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 from langchain_community.llms import HuggingFaceHub
+import PyPDF2
+from langchain_core.documents import Document
 
 # Load environment variables
 load_dotenv()
 HF_TOKEN = os.getenv('HUGGINGFACEHUB_API_TOKEN')
 
 # Define function to create vector store from URL
-def get_vectorstore_from_url(url, max_depth):
+def get_vectorstore_from_url(url, max_depth, pdf_text=None):
     try:
         if not os.path.exists('src/chroma'):
             os.makedirs('src/chroma')
         if not os.path.exists('src/scrape'):
             os.makedirs('src/scrape')
 
-        urls = scrape_urls(url, max_depth)
-        loader = WebBaseLoader(urls)
-        documents = loader.load()
+        documents = []
+        if url:
+            urls = scrape_urls(url, max_depth)
+            loader = WebBaseLoader(urls)
+            documents = loader.load()
+
+        if pdf_text:
+            documents.append(Document(page_content=pdf_text, metadata={"source": "uploaded_pdf"}))
 
         # Split text
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=256, chunk_overlap=0)
@@ -39,9 +46,9 @@ def get_vectorstore_from_url(url, max_depth):
             model_name="sentence-transformers/all-mpnet-base-v2"
         )
         vector_store = Chroma.from_documents(document_chunks, embedding)
-        return vector_store, len(urls)
+        return vector_store, len(documents)
     except Exception as e:
-        st.error(f"Error occurred during scraping: {e}")
+        st.error(f"Error occurred during processing: {e}")
         traceback.print_exc()
         return None, 0
 
@@ -97,8 +104,8 @@ def get_response(user_input):
     return ai_response
 
 # Streamlit app configuration
-st.set_page_config(page_title="WebChat 🤖: Chat With Websites", page_icon="🤖")
-st.title("WebChat 🤖: Your Web Assistant")
+st.set_page_config(page_title="WEB-AI 🤖: Chat With Websites", page_icon="🤖")
+st.title("WEB-AI 🤖: Your Web Assistant")
 
 # Initialize session state
 if "freeze" not in st.session_state:
@@ -112,28 +119,45 @@ if "vector_store" not in st.session_state:
 if "len_urls" not in st.session_state:
     st.session_state.len_urls = 0
 
+def extract_text_from_pdf(pdf_file):
+    pdf_reader = PyPDF2.PdfReader(pdf_file)
+    text = ""
+    for page_num in range(len(pdf_reader.pages)):
+        page = pdf_reader.pages[page_num]
+        text += page.extract_text() if page.extract_text() else ""
+    return text
+
+# Sidebar configuration
 # Sidebar configuration
 with st.sidebar:
-    st.header("AI Assistant 🤖")
-    website_url = st.text_input("Website URL")
+    st.header("WEB-AI 🤖")
+    website_url = st.text_input("Website URL (optional)")
+
+    st.title("PDF Uploader")
+    uploaded_file = st.file_uploader("Upload a PDF file (optional)", type=["pdf"])
 
     st.session_state.max_depth = st.slider("Select maximum scraping depth:", 1, 5, 1, disabled=st.session_state.freeze)
     if st.button("Proceed", disabled=st.session_state.freeze):
         st.session_state.freeze = True
 
+    pdf_text = None
+    if uploaded_file is not None:
+        st.write(f"Uploaded file: {uploaded_file.name}")
+        pdf_text = extract_text_from_pdf(uploaded_file)
+
 # Main app logic
-if website_url:
+if website_url or pdf_text:
     if st.session_state.freeze:
         if st.session_state.vector_store is None:
-            with st.spinner("Scraping Website..."):
-                st.session_state.vector_store, st.session_state.len_urls = get_vectorstore_from_url(website_url, st.session_state.max_depth)
+            with st.spinner("Processing content..."):
+                st.session_state.vector_store, st.session_state.len_docs = get_vectorstore_from_url(website_url, st.session_state.max_depth, pdf_text)
                 if st.session_state.vector_store:
-                    st.success(f"Scraping completed! Total Pages Scraped: {st.session_state.len_urls}")
+                    st.success(f"Processing completed! Total Documents: {st.session_state.len_docs}")
                 else:
                     st.error("Failed to create vector store.")
                     st.session_state.freeze = False
         else:
-            st.sidebar.success(f"Total Pages Scraped: {st.session_state.len_urls}")
+            st.sidebar.success(f"Total Documents Processed: {st.session_state.len_docs}")
 
         user_query = st.chat_input("Type your message here...")
         if user_query:
