@@ -71,11 +71,11 @@ def get_conversational_rag_chain(retriever_chain):
     )
 
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are an AI assistant that can provide concise and relevant answers based on the given context. Do not output the entire context, only the relevant information to answer the user's query."),
+        ("system", "Provide a concise and relevant answer to the user's question based on the given context."),
         MessagesPlaceholder(variable_name="chat_history"),
-        ("user", "{input}"),
+        ("human", "{input}"),
         ("system", "Context: {context}"),
-        ("user", "Given the above context, provide a concise and relevant answer to the original query.")
+        ("human", "Answer:")
     ])
 
     stuff_documents_chain = create_stuff_documents_chain(llm, prompt)
@@ -92,7 +92,9 @@ def get_response(user_input):
         "input": user_input
     })
 
-    return response['answer']
+    # Extract only the AI's response
+    ai_response = response['answer'].split("Answer:", 1)[-1].strip()
+    return ai_response
 
 # Streamlit app configuration
 st.set_page_config(page_title="WebChat 🤖: Chat With Websites", page_icon="🤖")
